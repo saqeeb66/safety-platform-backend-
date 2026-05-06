@@ -73,8 +73,8 @@ if (user.lockUntil) {
   return user;
 }
 
-  async register(data: any) {
-  const { email, password, role } = data;
+ async register(data: any) {
+  const { name, email, password, role } = data;
 
   const existing = await this.userRepository.findOne({
     where: { email },
@@ -87,6 +87,7 @@ if (user.lockUntil) {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const user = this.userRepository.create({
+    name, // ✅ FIX HERE
     email,
     password: hashedPassword,
     role: role || 'USER',
@@ -96,8 +97,11 @@ if (user.lockUntil) {
 
   const savedUser = await this.userRepository.save(user);
 
-  // 🔥 Audit log
-  await this.auditService.log(savedUser.id, savedUser.email, 'USER_REGISTERED');
+  await this.auditService.log(
+    savedUser.id,
+    savedUser.email,
+    'USER_REGISTERED',
+  );
 
   return {
     message: 'User registered successfully',
