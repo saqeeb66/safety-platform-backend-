@@ -7,11 +7,20 @@ export class LocationController {
 
   @Post()
   create(@Body() body: any) {
-    return this.locationService.create(body.name, body.parentId);
+    return this.locationService.create(
+      body.name,
+      body.type,        
+      body.parentId    
+    );
   }
 
   @Get()
   findAll() {
     return this.locationService.findAll();
+  }
+
+  @Get('tree')
+  getTree() {
+    return this.locationService.getTree();
   }
 }
