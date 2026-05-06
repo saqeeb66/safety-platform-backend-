@@ -10,6 +10,11 @@ export class AuthController {
     return 'Auth working';
   }
 
+  @Post('register')
+register(@Body() body: any) {
+  return this.authService.register(body);
+}
+
   @Post('login')
   login(@Body() body: any) {
     return this.authService.login(body.email, body.password); 
