@@ -10,26 +10,29 @@ export class LocationService {
     private locationRepository: Repository<Location>,
   ) {}
 
-  // 🔥 CREATE LOCATION (FIXED TYPES)
-  async create(name: string, type: string, parentId?: number) {
-    let parent: Location | null = null;
+ async create(name: string, type: string, parentId?: number) {
+  if (!name || !type) {
+    throw new Error('Name and Type are required');
+  }
 
-    if (parentId) {
-      parent = await this.locationRepository.findOne({
-        where: { id: parentId },
-      });
+  let parent: Location | null = null;
 
-      if (!parent) throw new NotFoundException('Parent not found');
-    }
-
-    const location = this.locationRepository.create({
-      name,
-      type,
-      parent: parent ?? undefined,
+  if (parentId) {
+    parent = await this.locationRepository.findOne({
+      where: { id: parentId },
     });
 
-    return this.locationRepository.save(location);
+    if (!parent) throw new NotFoundException('Parent not found');
   }
+
+  const location = this.locationRepository.create({
+    name,
+    type, 
+    parent: parent ?? undefined,
+  });
+
+  return this.locationRepository.save(location);
+}
 
   // 🔥 GET ALL
   async findAll() {
