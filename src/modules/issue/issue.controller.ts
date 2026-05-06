@@ -9,6 +9,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Delete,
   BadRequestException,
 } from '@nestjs/common';
 
@@ -72,6 +73,10 @@ export class IssueController {
   @Get('stats')
   getStats() {
     return this.issueService.getStats();
+  }
+  @Delete(':id')
+  remove(@Param('id') id: number) {
+  return this.issueService.remove(Number(id));
   }
 
   @Post('upload')
