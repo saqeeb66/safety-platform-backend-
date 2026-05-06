@@ -223,6 +223,18 @@ export class IssueService {
     };
   }
 
+  async remove(id: number) {
+  const issue = await this.issueRepository.findOne({
+    where: { id },
+  });
+
+  if (!issue) {
+    throw new NotFoundException('Issue not found');
+  }
+
+  return this.issueRepository.remove(issue);
+}
+
   async getDashboard() {
     const total = await this.issueRepository.count();
 
