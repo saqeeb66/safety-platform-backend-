@@ -73,6 +73,37 @@ if (user.lockUntil) {
   return user;
 }
 
+  async register(data: any) {
+  const { email, password, role } = data;
+
+  const existing = await this.userRepository.findOne({
+    where: { email },
+  });
+
+  if (existing) {
+    throw new UnauthorizedException('User already exists');
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const user = this.userRepository.create({
+    email,
+    password: hashedPassword,
+    role: role || 'USER',
+    failedAttempts: 0,
+    lockUntil: null,
+  });
+
+  const savedUser = await this.userRepository.save(user);
+
+  // 🔥 Audit log
+  await this.auditService.log(savedUser.id, savedUser.email, 'USER_REGISTERED');
+
+  return {
+    message: 'User registered successfully',
+  };
+}
+
 async login(email: string, password: string) {
   const user = await this.validateUser(email, password);
 
