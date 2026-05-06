@@ -14,6 +14,11 @@ export class LocationController {
     );
   }
 
+  @Delete(':id')
+remove(@Param('id') id: number) {
+  return this.locationService.delete(id);
+}
+
   @Get()
   findAll() {
     return this.locationService.findAll();
