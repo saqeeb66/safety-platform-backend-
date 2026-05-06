@@ -37,4 +37,5 @@ export class User {
 failedAttempts!: number;
 
   @Column({ type: 'timestamp', nullable: true })
-  lockUntil!: Date;
+  lockUntil?: Date | null;
+}
