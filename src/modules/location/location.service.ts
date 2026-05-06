@@ -70,6 +70,9 @@ export class LocationService {
 
     return result;
   }
+  async delete(id: number) {
+  return this.locationRepository.delete(id);
+}
 
   // 🔥 FILTER SUPPORT
   async getIdsForFiltering(locationId: number) {
