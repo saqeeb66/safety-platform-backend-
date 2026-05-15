@@ -21,8 +21,18 @@ import { CreateIssueDto } from './dto/create-issue.dto';
 
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Express } from 'express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import cloudinary from '../../config/cloudinary';
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => ({
+    folder: 'safety-platform',
+    allowed_formats: ['jpg', 'jpeg', 'png'],
+    public_id: `${Date.now()}-${file.originalname}`,
+  }),
+});
 
 @Controller('issues')
 export class IssueController {
@@ -74,23 +84,16 @@ export class IssueController {
   getStats() {
     return this.issueService.getStats();
   }
+
   @Delete(':id')
   remove(@Param('id') id: number) {
-  return this.issueService.remove(Number(id));
+    return this.issueService.remove(Number(id));
   }
 
   @Post('upload')
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          const uniqueName =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          cb(null, uniqueName + ext);
-        },
-      }),
+      storage,
     }),
   )
   uploadFile(@UploadedFile() file: Express.Multer.File) {
@@ -100,8 +103,7 @@ export class IssueController {
 
     return {
       message: 'File uploaded successfully',
-      filename: file.filename,
-      imagePath: `/uploads/${file.filename}`,
+      imagePath: file.path,
     };
   }
 
